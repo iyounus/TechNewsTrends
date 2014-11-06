@@ -29,7 +29,7 @@ def read_mongo():
     collection = db.articles
 
     columns = ['content','document_type','web_url','headline', \
-               'abstract','section_name', 'subsection_name','pub_date']
+               'section_name','pub_date']
 
     dict = {}
     for col in columns:
@@ -73,7 +73,9 @@ def featurize(article):
 
     # remove stopwords
     stop = stopwords.words('english')
-    stop.append('said') # some extra stop words not present in stopwords
+    # some extra stop words not present in stopwords
+    stop += ['said', 'would', 's', 'also']
+
     tokens = [token for token in tokens if token not in stop]
 
     # remove words less than three letters
@@ -89,26 +91,27 @@ def featurize(article):
     return tokens
 
 
-
 if __name__ == '__main__':
     
     # to save pickle of dataframe
     # df = read_mongo()
     # pkl.dump(df, open(pkl_file, "wb"))
 
-    n_features = 5000
-    n_topics = 10
-
     df = read_pickle()
     print "number of articles in dataframe: ", df.shape[0]
 
+    n_features = 5000
     vectorizer = TfidfVectorizer(tokenizer=featurize, max_features=n_features)
     vectors = vectorizer.fit_transform(df.content).toarray()
 
-    nmf = NMF(n_components=n_topics, random_state=1).fit(vectors)
-
-    # save the vertorizer and model to be analyzed later
     print "Writing: ", "data/vectorizer.pkl"
-    print "Writing: ", "data/nmf.pkl"
     pkl.dump( vectorizer, open("data/vectorizer.pkl", "wb"))
-    pkl.dump( nmf, open("data/nmf.pkl", "wb"))
+    pkl.dump( vectors, open("data/vectors.pkl", "wb"))
+
+    n_topics = [5,10,15,20,25,30]
+
+    for n in n_topics:
+        nmf = NMF(n_components=n).fit(vectors)
+        outfile = "data/nmf_" + str(n) + ".pkl"
+        print "Writing: ", outfile
+        pkl.dump(nmf, open(outfile, "wb"))
