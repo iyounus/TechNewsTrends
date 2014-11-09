@@ -1,58 +1,75 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
 body {
-  font: 10px sans-serif;
+	font: 10px sans-serif;
 }
 
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
 }
 
 .bar {
-  fill: orange;
+	fill: orange;
 }
 
 .bar:hover {
-  fill: orangered ;
+	fill: orangered ;
 }
 
-.x.axis path {
-  display: none;
-}
 
+/*.x.axis path {
+	display: none;
+}
+*/
 .d3-tip {
-  line-height: 1;
-  font-weight: bold;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  border-radius: 2px;
+	line-height: 1;
+	font-weight: bold;
+	padding: 12px;
+	background: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	border-radius: 2px;
 }
 
 /* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
-  content: "\25BC";
-  position: absolute;
-  text-align: center;
+	box-sizing: border-box;
+	display: inline;
+	font-size: 10px;
+	width: 100%;
+	line-height: 1;
+	color: rgba(0, 0, 0, 0.8);
+	content: "\25BC";
+	position: absolute;
+	text-align: center;
 }
 
 /* Style northward tooltips differently */
 .d3-tip.n:after {
-  margin: -1px 0 0 0;
-  top: 100%;
-  left: 0;
+	margin: -1px 0 0 0;
+	top: 100%;
+	left: 0;
 }
+
+/* this code is for time series plot */
+ div.tooltip {
+ 	position: absolute;	
+ 	text-align: center;	
+  	width: 60px;	
+  	height: 28px;		
+  	padding: 2px;	
+  	font: 12px sans-serif;	
+  	background: lightsteelblue;	
+  	border: 0px;					
+  	border-radius: 8px;
+  	/*  pointer-events: none;	This line needs to be removed */	
+  	}
+
+
+
 </style>
 
 <h1> New York Times Tech News Topics </h1>
@@ -60,16 +77,19 @@ body {
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
 <script>
 
 var margin = {top: 120, right: 20, bottom: 30, left: 70},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = 800 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+var topic = 2
 
 var formatPercent = d3.format(".0%");
 
 var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width], .1);
+	    .rangeRoundBands([0, width], .1);
 
 var y = d3.scale.linear()
     .range([height, 0]);
@@ -84,55 +104,163 @@ var yAxis = d3.svg.axis()
     <!-- .tickFormat(formatPercent); -->
 
 var tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([-10, 0])
-  .html(function(d) {
-    <!-- return "<strong>Frequency:</strong> <P style='color:red'>"  -->
-    <!-- + d.label1 + "<P style='color:red'>" + d.label2 + "</P>"; -->
-    return "<img src='static/topic_" + d.letter + 
-				    ".png' style='width:170px'>"
-  })
+	.attr('class', 'd3-tip')
+	.offset([-10, 0])
+  	.html(function(d) {
+    return "<img src='static/topic_" + d.letter + ".png' style='width:170px'>"
+  	})
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+	.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 svg.call(tip);
 
+
+/* second plot */
+
+// Set the dimensions of the canvas / graph
+// var	margin = {top: 30, right: 20, bottom: 30, left: 50},
+// 	width = 600 - margin.left - margin.right,
+//     height = 270 - margin.top - margin.bottom;
+
+// Parse the date / time
+var parseDate = d3.time.format("%Y-%m-%d").parse;
+var formatTime = d3.time.format("%e %B");// Format tooltip date / time
+
+// // Set the ranges
+var	x2 = d3.time.scale().range([0, width]);
+var	y2 = d3.scale.linear().range([height, 0]);
+
+// // Define the axes
+var	xAxis2 = d3.svg.axis().scale(x2).orient("bottom").ticks(10);
+var	yAxis2 = d3.svg.axis().scale(y2).orient("left").ticks(5);
+
+// <!-- // Define the line -->
+// <!-- var	valueline = d3.svg.line() -->
+// <!-- .x(function(d) { return x(d.pub_week_date); }) -->
+// <!-- .y(function(d) { return y(d.N_articles); }); -->
+
+
+// // Define 'div' for tooltips
+var div = d3.select("body")
+	.append("div")  // declare the tooltip div 
+	.attr("class", "tooltip")              // apply the 'tooltip' class
+    .style("opacity", 0);                  // set the opacity to nil
+
+
+// // Adds the svg canvas
+var	svg2 = d3.select("body")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", 
+    "translate(" + margin.left + "," + 60 + ")");
+
+
+
 d3.tsv("static/data.tsv", type, function(error, data) {
-  x.domain(data.map(function(d) { return d.letter; }));
-  y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+	x.domain(data.map(function(d) { return d.letter; }));
+	y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
 
 
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+	svg.append("g")
+      	.attr("class", "x axis")
+      	.attr("transform", "translate(0," + height + ")")
+      	.call(xAxis);
 
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Frequency");
+  	svg.append("g")
+      	.attr("class", "y axis")
+      	.call(yAxis)
+    	.append("text")
+      	.attr("transform", "rotate(-90)")
+      	.attr("y", 6)
+      	.attr("dy", ".71em")
+      	.style("text-anchor", "end")
+      	.text("Frequency");
 
-  svg.selectAll(".bar")
-      .data(data)
-      .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.letter); })
-      .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.frequency); })
-      .attr("height", function(d) { return height - y(d.frequency); })
-      .on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
+  	svg_bars = svg.selectAll(".bar")
+      	.data(data)
+      	.enter().append("rect")
+      	.attr("class", "bar")
+      	.attr("x", function(d) { return x(d.letter); })
+      	.attr("width", x.rangeBand())
+      	.attr("y", function(d) { return y(d.frequency); })
+      	.attr("height", function(d) { return height - y(d.frequency); })
+      	.on('mouseover', tip.show)
+      	//.on('mouseout', tip.hide)
+    // Get the data for second plot
 
-});
+
+    d3.csv("static/data_20.csv", function(error, data2) {
+    	data2.forEach(function(d) {
+    		d.date = parseDate(d.pub_week_date);
+    		d.close = +d.N_articles;
+    		d.topic = +d.topic;
+    		d.url1 = d.url1
+    	});
+
+    	// Scale the range of the data
+    	x2.domain(d3.extent(data2, function(d) { return d.date; }));
+    	y2.domain([0, d3.max(data2, function(d) { return d.close; })]);
+
+    	<!-- // Add the valueline path. -->
+    	<!-- svg.append("path") -->
+    	<!-- .attr("class", "line") -->
+    	<!-- .attr("d", valueline(data)); -->
+
+    	// Add the X Axis
+    	svg2.append("g")
+    	.attr("class", "x axis")
+    	.attr("transform", "translate(0," + height + ")")
+    	.call(xAxis2);
+    
+    	// Add the Y Axis
+    	svg2.append("g")
+    	.attr("class", "y axis")
+    	.call(yAxis2);
+
+    // draw the scatterplot
+    svg_bars.on("click", function(d) {
+      	topic = +d.letter
+		svg2.selectAll('circle').remove();   	
+	
+    	svg2.selectAll("dot").data(data2)
+    		.enter().append("circle")
+    		.filter(function(d) { return d.topic == topic })
+    		.attr("r", 5)
+    		.attr("cx", function(d) { return x2(d.date); })		 
+    		.attr("cy", function(d) { return y2(d.close); })
+    		.attr("fill", "orange")
+			.on("mouseout", function(d) {
+				d3.select(this).style("fill", "orange");
+			})
+    	// Tooltip stuff after this
+    		.on("mouseover", function(d) {
+    		d3.select(this).style("fill", "red");
+    		div.transition()
+    		.duration(500)
+    		.style("opacity", 0);
+    		div.transition()
+    		.duration(200)
+    		.style("opacity", .9);
+    		div.html(
+    		'<a href="http://www.google.com"  >' + // The first <a> tag
+    		formatTime(d.date) +
+    		"</a>" +                          // closing </a> tag
+    		"<br/>"  + d.close)
+    		.style("left", (d3.event.pageX) + "px")
+    		.style("top", (d3.event.pageY - 28) + "px");
+    	});
+	});
+
+
+}) // csv for 2nd plot
+
+}); // tsv for first plot
 
 function type(d) {
   d.frequency = +d.frequency;

@@ -68,13 +68,13 @@ def featurize(article):
     '''
 
     # tokenize into words
-    tokens = [word for sent in sent_tokenize(article) \
+    tokens = [word.lower() for sent in sent_tokenize(article) \
               for word in word_tokenize(sent)]
 
     # remove stopwords
     stop = stopwords.words('english')
     # some extra stop words not present in stopwords
-    stop += ['said', 'would', 's', 'also']
+    stop += ['said', 'would', 's', 'also', 'mr']
 
     tokens = [token for token in tokens if token not in stop]
 
@@ -82,7 +82,7 @@ def featurize(article):
     tokens = [word for word in tokens if len(word) >= 3]
 
     # lower capitalization
-    tokens = [word.lower() for word in tokens]
+    #tokens = [word.lower() for word in tokens]
 
     # lemmatize
     lmtzr = WordNetLemmatizer()
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     pkl.dump( vectorizer, open("data/vectorizer.pkl", "wb"))
     pkl.dump( vectors, open("data/vectors.pkl", "wb"))
 
-    n_topics = [5,10,15,20,25,30]
+    n_topics = range(5,101,5)
 
     for n in n_topics:
         nmf = NMF(n_components=n).fit(vectors)
