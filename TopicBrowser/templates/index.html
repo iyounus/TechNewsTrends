@@ -64,12 +64,13 @@ div.tooltip {
   	}
 
 div.tooltip a {
-	color: white;
-
+	color: blue;
+	text-decoration: none;
 }
 
 div.tooltip a:hover {
 	color: blue;
+		text-decoration: underline;
 }
 </style>
 
@@ -87,10 +88,8 @@ var margin = {top: 80, right: 20, bottom: 30, left: 70},
 
 var topic = 0
 
-var formatPercent = d3.format(".0%");
-
 var x = d3.scale.ordinal()
-	    .rangeRoundBands([0, width], .1);
+    .rangeRoundBands([0, width], .1);
 
 var y = d3.scale.linear()
     .range([height, 0]);
@@ -159,6 +158,14 @@ var	svg2 = d3.select("body")
 d3.tsv("static/data.tsv", type, function(error, data) {
 	x.domain(data.map(function(d) { return d.letter; }));
 	y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+
+	svg.append("image")
+		.attr("class", "wordCloud")
+		.attr("x", 460)
+      	.attr("y", -50)
+      	.attr("width", 250)
+      	.attr("height", 125)
+      	.attr("xlink:href", "static/topic_" + topic + ".png");
 
 	svg.append("g")
       	.attr("class", "x axis")
@@ -269,6 +276,8 @@ d3.tsv("static/data.tsv", type, function(error, data) {
 		    	div.style("opacity", 0)
 		      	var topic = +d.letter - 1;
 
+		      	svg.select("image.wordCloud")
+		      		.attr("xlink:href", "static/topic_" + d.letter + ".png");
 		      	drawTopic(topic);
 			};
 
