@@ -4,10 +4,10 @@ import pickle as pkl
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import NMF
 
-from nltk import WordNetLemmatizer, word_tokenize
+#from nltk import WordNetLemmatizer, word_tokenize
 
 from MongoToDataFrame import MongoToDataFrame
-
+from utils import stop_words, tokenize
 
 
 class Model(object):
@@ -80,41 +80,9 @@ class Model(object):
 
 
 
-def stopWords():
-    '''
-    INPUT None
-    OUTPUT list
-    '''
-    with open('StopWords.txt', 'r') as f:
-        stop = [line.strip() for line in f]
-    return stop
-
-
-def tokenize(article):
-    '''
-    INPUT string
-    OUTPUT list
-
-    This is a tokenizer to replace the default tokenizer in TfidfVectorizer
-    '''
-    tokens = [word.lower() for word in word_tokenize(article)]
-
-    tokens = [word for word in tokens if word not in StopW]
-
-    # remove words less than three letters
-    tokens = [word for word in tokens if len(word) >= 3]
-
-    # lemmatize
-    lmtzr = WordNetLemmatizer()
-    tokens = [lmtzr.lemmatize(word) for word in tokens]
-
-    return tokens
-
-
 if __name__ == '__main__':
-    StopW = stopWords()
 
-    df = MongoToDataFrame().GetDataFrame()
+    df = MongoToDataFrame().get_data_frame()
 
     model = Model(df)
 
