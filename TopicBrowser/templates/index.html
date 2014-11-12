@@ -216,13 +216,14 @@ d3.csv("static/articles_per_topic.csv", type, function(error, data) {
 	    // Add the valueline path. -->
 	    svg2.append("path")
 	    	.attr('class', 'timeSeries')
-            .attr("stroke", "blue")
-            .attr("stroke-width", 2)
-            .attr("fill", "none")
-            .attr("d", lineFunction(data2));
+        .attr("stroke", "blue")
+        .attr("stroke-width", 2)
+        .attr("fill", "none")
+        .attr("d", lineFunction(data2));
 
     	svg2.selectAll("dot").data(data2)
     		.enter().append("circle")
+        .attr("class","time_plot")
     		.attr("r", 5)
     		.attr("cx", function(d) { return x2(d.date); })		 
     		.attr("cy", function(d) { return y2(d.articles); })
@@ -255,7 +256,7 @@ d3.csv("static/articles_per_topic.csv", type, function(error, data) {
 
     var resetPlot = function(d) {
     	d3.selectAll("a").remove()
-    	d3.selectAll("circle").style("fill", "orange")
+    	d3.selectAll("circle.time_plot").style("fill", "orange")
 	    div.transition().duration(500).style("opacity", 0);
     	div.transition().duration(200).style("opacity", .9);
     }
@@ -275,13 +276,24 @@ d3.csv("static/articles_per_topic.csv", type, function(error, data) {
 		    };
 
 		    var reDraw = function(d) {
+          var topic = +d.ntopic;
+          d3.select("rect.selected_bar").remove()
+          svg.append('rect')
+             .attr("class","selected_bar")
+             .attr("x", function(d) { return x(topic + 1); })    
+             .attr("y", 291)
+             .attr("width", x.rangeBand())
+             .attr("height", 18)
+             .attr("fill","orange")
+             .style("opacity", 0.5);
+
 		    	d3.selectAll("a").remove()
 		    	div.style("opacity", 0)
-		      	var topic = +d.ntopic;
 
-		      	svg.select("image.wordCloud")
-		      		.attr("xlink:href", "static/topic_" + d.ntopic + ".png");
-		      	drawTopic(topic);
+
+		      svg.select("image.wordCloud")
+		      	 .attr("xlink:href", "static/topic_" + d.ntopic + ".png");
+		      	 drawTopic(topic);
 			};
 
 		    // draw the scatterplot
