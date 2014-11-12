@@ -234,10 +234,11 @@ d3.csv("static/articles_per_topic.csv", type, function(error, data) {
     		.on("mouseover", function(d) {
     			resetPlot(d)
 
-    			d3.select(this).style("fill", "red");
-				var	urls = []
+    		  d3.select(this).style("fill", "red");
+
+				  var	urls = []
 	    		var nLines = d.N_articles > 5 ? 5 : d.N_articles
-    			for(var i = 1; i <= nLines; i++) {
+    			for(var i = 0; i < nLines; i++) {
     				urls.push({
     					href : d['url' + i], txt : d['headline' + i]
     				});
