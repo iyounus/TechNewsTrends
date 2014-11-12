@@ -59,4 +59,4 @@ class MongoToDataFrame(object):
 
 if __name__ == '__main__':
     m2df = MongoToDataFrame()
-    m2df.save_pickle_df("nyt_tech_temp.pkl")
+    m2df.save_pickle_df("data/nyt_data.pkl")

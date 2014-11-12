@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 def DrawWordCloud(df, topic, n_articles=50, save=True):
-    ftopic = df[df['topic']==topic].sort('weight',ascending=False).head(n_articles)
+    ftopic = df[df['topic_sorted']==topic].sort('weight',ascending=False).head(n_articles)
     text = list(ftopic['content'].values)
     text = " ".join(text)
     #remove stop words and lemmatize
@@ -24,21 +24,23 @@ def DrawWordCloud(df, topic, n_articles=50, save=True):
     plt.axis("off")
 
     if save:
-        fileName = "topic_"+str(topic+1)+"temp.png"
+        fileName = outdir + "topic_"+str(topic)+"temp.png"
         plt.savefig(fileName, bbox_inches='tight')
 
 
 if __name__=="__main__":
-    df = pkl.load(open("nyt_tech_temp.pkl"))
-    df = assign_topics(df, modle_file='model.pkl', vector_file='vectors.pkl')
+    outdir = "TopicBrowser/static/"
 
-    n_topics = 10
+    df = pkl.load(open("data/nyt_data.pkl"))
+    df = assign_topics(df, modle_file='data/model.pkl', vector_file='data/vectors.pkl')
+
+    n_topics = 20
     for i in range(n_topics):
         DrawWordCloud(df, i)
 
     # trim output wordcloud images using imagemagick convert function
     for i in range(n_topics):
-        fileName = "topic_" + str(i+1) + "temp.png"
+        fileName = outdir + "topic_" + str(i) + "temp.png"
         os.system("convert " + fileName + " -trim " + \
-                  "topic_" + str(i+1) + ".png")
+                  outdir + "topic_" + str(i) + ".png")
         os.system("rm " + fileName)

@@ -15,7 +15,7 @@ def creat_df(pickle_file):
     '''
     df = pkl.load(open(pickle_file))
 
-    # add columns needed for analysis    
+    # add columns needed for analysis
     df['pub_date'] = pd.to_datetime(df['pub_date'])
     df['pub_week'] = df.pub_date.map(lambda x : date.isocalendar(x)[1])
     df['pub_year'] = df.pub_date.map(lambda x : date.isocalendar(x)[0])
@@ -36,29 +36,53 @@ def assign_topics(df, modle_file, vector_file):
     W = nmf.components_
     A = vectors.dot(W.T)
 
-    df['topic'] = list(np.argmax(A, axis=1))
+    df['topic'] = list(np.argmax(A, axis=1)) # topic number starts from 0
     df['weight'] = list(np.max(A, axis=1))
+
+    # now sort topics w.r.t number of articles per topic
+    # this is just renaming the topic
+    dg = df[['topic','headline']].groupby('topic')
+    x = sorted(dg.groups.keys())
+    y = [len(dg.groups[i]) for i in x]
+    m = list(np.argsort(y)[::-1])
+    d = {j : x[i] for i, j in enumerate(m)}
+
+    df['topic_sorted'] = df['topic'].map(lambda x : d[x])
 
     return df
 
 
-def creat_data_dict(df):
+def articles_per_topic(df, outfile):
+    dg = df[['topic_sorted','headline']].groupby('topic_sorted')
+    x = sorted(dg.groups.keys())
+    y = [len(dg.groups[i]) for i in x]
+
+    f = open(outfile,'w')
+    f.write("ntopic,frequency\n")
+    for i,val in enumerate(x):
+        f.write(str(val)+','+str(y[i])+'\n')
+    f.close()
+
+
+def creat_data_csv(df):
     '''
     INPUT DataFrame
     OUTPUT DataFrame
+
+    creats DataFrame to be written to csv file which is used by web app
     '''
     #columns to be written in csv file
-    col0 = ['topic','pub_week','pub_week_date','headline','web_url']
-    col1 = ["headline"+str(i+1) for i in range(5)]
-    col2 = ['url'+str(i+1) for i in range(5)]
+    col0 = ['topic_sorted','pub_week','pub_week_date','headline','web_url']
+    col1 = ["headline"+str(i) for i in range(5)]
+    col2 = ['url'+str(i) for i in range(5)]
 
     j = []
-    for topic in df.topic.order().unique().tolist():
-        for pub_week_date in df.pub_week_date.order().unique().tolist():
+    for topic in df['topic_sorted'].order().unique().tolist():
+        for pub_week_date in df['pub_week_date'].order().unique().tolist():
             pub_week_date_str = pub_week_date.strftime("%Y-%m-%d")
 
-            cond = "topic == " + str(topic) + " & pub_week_date_str == '" + \
-                                 pub_week_date_str + "'"
+            cond = "topic_sorted == " + str(topic) + \
+                   " & pub_week_date_str == '" + pub_week_date_str + "'"
             dg = df.query(cond).sort(['weight'], ascending=[0])[col0]
 
             headlines = [unicodedata.normalize('NFKD', h).encode('ascii','ignore')
@@ -84,9 +108,10 @@ def creat_data_dict(df):
 
 
 if __name__=='__main__':
-    df = creat_df('nyt_tech_temp.pkl')
-    df = assign_topics(df, modle_file='model.pkl', vector_file='vectors.pkl')
+    df = creat_df('data/nyt_data.pkl')
+    df = assign_topics(df, modle_file='data/model.pkl',
+                           vector_file='data/vectors.pkl')
 
-    newdf = creat_data_dict(df)
-    newdf.to_csv("data.csv", index=False)
-
+    articles_per_topic(df, "TopicBrowser/static/articles_per_topic.csv")
+    newdf = creat_data_csv(df)
+    newdf.to_csv("TopicBrowser/static/data.csv", index=False)

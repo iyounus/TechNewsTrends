@@ -86,7 +86,7 @@ var margin = {top: 80, right: 20, bottom: 30, left: 70},
     width = 800 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
-var topic = 1
+var topic = 0
 
 var x = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);
@@ -106,7 +106,7 @@ var tip = d3.tip()
 	.attr('class', 'd3-tip')
 	.offset([-10, 0])
   	.html(function(d) {
-    return "<img src='static/topic_" + d.letter + ".png' style='width:120px'>"
+    return "<img src='static/topic_" + d.ntopic + ".png' style='width:120px'>"
   	})
 
 var svg = d3.select("body").append("svg")
@@ -155,8 +155,9 @@ var	svg2 = d3.select("body")
     "translate(" + margin.left + "," + 60 + ")");
 
 
-d3.tsv("static/data.tsv", type, function(error, data) {
-	x.domain(data.map(function(d) { return d.letter; }));
+d3.csv("static/articles_per_topic.csv", type, function(error, data) {
+  // In the data file, ntopic starts from 0, x axis values here start from 1
+	x.domain(data.map(function(d) { return d.ntopic + 1; }));
 	y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
 
 	svg.append("image")
@@ -186,7 +187,8 @@ d3.tsv("static/data.tsv", type, function(error, data) {
       	.data(data)
       	.enter().append("rect")
       	.attr("class", "bar")
-      	.attr("x", function(d) { return x(d.letter); })
+        // In the data file, ntopic starts from 0, x axis values here start from 1
+      	.attr("x", function(d) { return x(d.ntopic + 1); })
       	.attr("width", x.rangeBand())
       	.attr("y", function(d) { return y(d.frequency); })
       	.attr("height", function(d) { return height - y(d.frequency); })
@@ -257,7 +259,7 @@ d3.tsv("static/data.tsv", type, function(error, data) {
     	div.transition().duration(200).style("opacity", .9);
     }
 
-    d3.csv("static/data_20.csv", function(d) {
+    d3.csv("static/data.csv", function(d) {
     		d.date = parseDate(d.pub_week_date);
     		d.articles = +d.N_articles;
     		d.topic = +d.topic;
@@ -274,10 +276,10 @@ d3.tsv("static/data.tsv", type, function(error, data) {
 		    var reDraw = function(d) {
 		    	d3.selectAll("a").remove()
 		    	div.style("opacity", 0)
-		      	var topic = +d.letter - 1;
+		      	var topic = +d.ntopic;
 
 		      	svg.select("image.wordCloud")
-		      		.attr("xlink:href", "static/topic_" + d.letter + ".png");
+		      		.attr("xlink:href", "static/topic_" + d.ntopic + ".png");
 		      	drawTopic(topic);
 			};
 
@@ -290,6 +292,7 @@ d3.tsv("static/data.tsv", type, function(error, data) {
 }); // tsv for first plot
 
 function type(d) {
+  d.ntopic = +d.ntopic
   d.frequency = +d.frequency;
   return d;
 }

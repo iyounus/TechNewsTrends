@@ -23,7 +23,7 @@ class Model(object):
         '''
         Output dir and file names:
         '''
-        self.outdir = "./" # current dir 
+        self.outdir = "data/" # current dir 
         self.vect_file1 = self.outdir + "vectorizer.pkl"
         self.vect_file2 = self.outdir + "vectors.pkl"
         self.model_file = self.outdir + "model.pkl"
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     model = Model(df)
 
     # build only one model
-    model.build_model(10)
+    model.build_model(20) # 20 topics
     model.pickle_model()
 
     # build more that one models with different number of topics
