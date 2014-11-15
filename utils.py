@@ -5,7 +5,7 @@ def stop_words():
     INPUT None
     OUTPUT list
     '''
-    with open('StopWords.txt', 'r') as f:
+    with open('stop_words.txt', 'r') as f:
         stop = [line.strip() for line in f]
     return stop
 
