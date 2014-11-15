@@ -4,93 +4,61 @@ import pickle as pkl
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import NMF
 
-#from nltk import WordNetLemmatizer, word_tokenize
-
-from MongoToDataFrame import MongoToDataFrame
-from utils import stop_words, tokenize
+#from utils import stop_words, tokenize
 
 
 class Model(object):
-    def __init__(self, df, n_features=5000):
+    def __init__(self, df, n_topics, n_features=5000, outdir='data/',
+                 vectorizer=None, vector=None):
         self.n_features = n_features
-
         self.df = df
+        self.n_topics = n_topics        
+        self.vectorizer = vectorizer
+        self.vector = vector
 
-        self.vectorizer = None
-        self.vector = None
         self.model = None
 
-        '''
-        Output dir and file names:
-        '''
-        self.outdir = "data/" # current dir 
-        self.vect_file1 = self.outdir + "vectorizer.pkl"
-        self.vect_file2 = self.outdir + "vectors.pkl"
-        self.model_file = self.outdir + "model.pkl"
+        #Output dir and file names:
+        self.outdir = outdir # current dir 
+        self.model_file = self.outdir + 'model_' + str(n_topics) + '.pkl'
 
 
     def vectorize(self):
-        vectorizer = TfidfVectorizer(tokenizer=tokenize,
-                                     max_features=self.n_features)
-        vector = vectorizer.fit_transform(self.df.content).toarray()
-        return vectorizer, vector
+        if self.vectorizer is None:
+            self.vectorizer = TfidfVectorizer(tokenizer=tokenize,
+                                              max_features=self.n_features)
+            print 'Writing: ', outdir + 'vectorizer.pkl'
+            pkl.dump(self.vectorizer,
+                     open(self.outdir + 'vectorizer.pkl', "wb"))
 
 
-    def build_model(self, n_topics):
+        if self.vector is None:
+            self.vector = self.vectorizer.fit_transform(self.df.content).toarray()
+            print 'Writing: ', outdir + 'vector.pkl'
+            pkl.dump(self.vector,
+                     open(self.outdir + 'vector.pkl', "wb"))
+
+        return self.vectorizer, self.vector
+
+
+    def build_model(self):
         self.vectorizer, self.vector = self.vectorize()
-        self.model = NMF(n_components=n_topics).fit(self.vector)
+        self.model = NMF(n_components=self.n_topics).fit(self.vector)
 
-
-    def build_models(self, n_topics):
-        '''
-        INPUT list
-        OUTPUT None
-        '''
-        self.model = []
-        for n in n_topics:
-            nmf = NMF(n_components=n).fit(self.vector)
-            self.model.append(nmf)
-
-
-    def pickle_model(self):
-        if self.vector is not None:
-            print "Writing: ", self.vect_file1
-            pkl.dump(self.vectorizer, open(self.vect_file1, "wb"))
-            print "Writing: ", self.vect_file2
-            pkl.dump( self.vector, open(self.vect_file2, "wb"))
-
-        if self.model is not None:
-            print "Writing: ", self.model_file
-            pkl.dump(self.model, open(self.model_file, "wb"))
-
-
-    def pickle_models(self):
-        if self.vector is not None:
-            print "Writing: ", self.vect_file1
-            pkl.dump(self.vectorizer, open(self.vect_file1, "wb"))
-            print "Writing: ", self.vect_file2
-            pkl.dump(self.vector, open(self.vect_file2, "wb"))
-
-        prefix, ext = self.model_file.split('.')
-        if self.model is not None and len(self.model) > 0:
-            for i, model in self.model:
-                outfile = prefix + "_" + str(i) + ".pkl"
-                print "Writing: ", outfile
-                pkl.dump(model, open(outfile, "wb"))
-
+        print "Writing: ", self.model_file
+        pkl.dump(self.model, open(self.model_file, "wb"))
 
 
 if __name__ == '__main__':
 
-    df = MongoToDataFrame().get_data_frame()
+    df = pkl.load(open('data/data_all.pkl'))
 
-    model = Model(df)
+    #model = Model(df, n_topics=30)
+
+    vectorizer = pkl.load(open('data/vectorizer.pkl'))
+    vector = pkl.load(open('data/vector.pkl'))
+
+    model = Model(df, n_topics=50, vectorizer=vectorizer, vector=vector)
 
     # build only one model
-    model.build_model(20) # 20 topics
-    model.pickle_model()
-
-    # build more that one models with different number of topics
-    #n_topics = range(5,51,5)
-    #model.build_models(n_topics)
-    #model.pickle_models()
+    model.build_model()

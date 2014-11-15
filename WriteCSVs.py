@@ -90,6 +90,7 @@ def creat_data_csv(df):
             urls = dg['web_url'].values.tolist()
 
             row = {}
+            #if (len(urls) > 0):
             row['N_articles'] = len(urls)
             row['pub_week_date'] = pub_week_date_str
             row['topic'] = topic
@@ -108,9 +109,9 @@ def creat_data_csv(df):
 
 
 if __name__=='__main__':
-    df = creat_df('data/nyt_data.pkl')
-    df = assign_topics(df, modle_file='data/model.pkl',
-                           vector_file='data/vectors.pkl')
+    df = creat_df('data/data_all.pkl')
+    df = assign_topics(df, modle_file='data/model_30.pkl',
+                           vector_file='data/vector.pkl')
 
     articles_per_topic(df, "TopicBrowser/static/articles_per_topic.csv")
     newdf = creat_data_csv(df)

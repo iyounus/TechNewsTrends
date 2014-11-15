@@ -31,10 +31,11 @@ def DrawWordCloud(df, topic, n_articles=50, save=True):
 if __name__=="__main__":
     outdir = "TopicBrowser/static/"
 
-    df = pkl.load(open("data/nyt_data.pkl"))
-    df = assign_topics(df, modle_file='data/model.pkl', vector_file='data/vectors.pkl')
+    df = pkl.load(open("data/data_all.pkl"))
+    df = assign_topics(df, modle_file='data/model_30.pkl',
+                           vector_file='data/vector.pkl')
 
-    n_topics = 20
+    n_topics = 30
     for i in range(n_topics):
         DrawWordCloud(df, i)
 

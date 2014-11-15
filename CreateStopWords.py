@@ -12,7 +12,7 @@ def StopWords()
     # some extra stop words not present in stopwords
     stop += ['said', 'would', 's', 'also', 'u', 'mr', 're', 'may', 'one',\
              'two', 'buy', 'much', 'take', 'might', 'say', 'new', 'year',
-             'many']
+             'many', 'reporting', 'editing']
 
     return sorted(set(stop))
 
