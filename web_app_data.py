@@ -66,7 +66,9 @@ class WebAppData(object):
         d = self.articles_week_dict()
         f = open(outfile,'w')
         f.write("date,articles_week\n")
-        for key in d:
+
+        keylist = sorted(d.keys())
+        for key in keylist:
             f.write(key+','+str(d[key])+'\n')
         f.close()
 
