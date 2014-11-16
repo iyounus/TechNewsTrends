@@ -1,3 +1,5 @@
+from __future__ import division
+
 import numpy as np
 import pandas as pd
 import pickle as pkl
@@ -41,9 +43,7 @@ class WebAppData(object):
         W = self.nmf.components_
         A = self.vectors.dot(W.T)
 
-        # topic number starts from 1
-        # topic=0 represents all ariticle regardless of topic
-        self.df['topic'] = list(np.argmax(A, axis=1) + 1)
+        self.df['topic'] = list(np.argmax(A, axis=1))
         self.df['weight'] = list(np.max(A, axis=1))
 
         # now sort topics w.r.t number of articles per topic
@@ -51,10 +51,24 @@ class WebAppData(object):
         dg = self.df[['topic','headline']].groupby('topic')
         x = sorted(dg.groups.keys())
         y = [len(dg.groups[i]) for i in x]
-        m = list(np.argsort(y)[::-1] + 1)
+        m = list(np.argsort(y)[::-1])
         d = {j : x[i] for i, j in enumerate(m)}
 
         self.df['topic_sorted'] = self.df['topic'].map(lambda x : d[x])
+
+
+    def articles_week_dict(self): #articles per week
+        dg = self.df[['pub_week_date_str','headline']].groupby('pub_week_date_str')
+        return dg.size().to_dict()
+
+
+    def articles_week(self, outfile):
+        d = self.articles_week_dict()
+        f = open(outfile,'w')
+        f.write("date,articles_week\n")
+        for key in d:
+            f.write(key+','+str(d[key])+'\n')
+        f.close()
 
 
     def articles_topic(self, outfile): #articles per topic
@@ -81,6 +95,7 @@ class WebAppData(object):
         col1 = ["headline"+str(i) for i in range(5)]
         col2 = ['url'+str(i) for i in range(5)]
 
+        d = self.articles_week_dict()
         for topic in self.df['topic_sorted'].order().unique().tolist():
             for pub_week_date in self.df['pub_week_date'].order().unique().tolist():
                 pub_week_date_str = pub_week_date.strftime("%Y-%m-%d")
@@ -95,7 +110,8 @@ class WebAppData(object):
 
                 row = {}
                 #if (len(urls) > 0):
-                row['N_articles'] = len(urls)
+                row['n_articles'] = len(urls)
+                row['fraction'] = len(urls)/d[pub_week_date_str]
                 row['pub_week_date'] = pub_week_date_str
                 row['topic'] = topic
                 row['pub_week'] = date.isocalendar(pub_week_date)[1]
@@ -111,13 +127,15 @@ class WebAppData(object):
 
         newdf = pd.DataFrame(self.data)
         # rearrange columns
-        newdf = newdf[['topic','pub_week','N_articles','pub_week_date']+col1+col2]
+        newdf = newdf[['topic','pub_week','n_articles','fraction','pub_week_date']+
+                        col1+col2]
         newdf.to_csv(outfile, index=False)
 
 
-    def wrtie_data(self, outfile1, outfile2):
+    def wrtie_data(self, outfile1, outfile2, outfile3):
         self.articles_topic(outfile1)
-        self.articles_topic_week(outfile2)
+        self.articles_week(outfile2)
+        self.articles_topic_week(outfile3)
 
 
 if __name__=='__main__':
@@ -130,5 +148,6 @@ if __name__=='__main__':
     app_data = WebAppData(df, model, vectors)
 
     app_data.wrtie_data('topic_browser/static/articles_per_topic.csv',
+                        'topic_browser/static/articles_per_week.csv',
                         'topic_browser/static/data.csv')
 

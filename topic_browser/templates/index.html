@@ -1,76 +1,81 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+
 <style>
 body {
-	font: 10px sans-serif;
+  font: 10px sans-serif;
 }
 
 .axis path,
 .axis line {
-	fill: none;
-	stroke-width: 1;
-	stroke: #000;
-	shape-rendering: crispEdges;
+  fill: none;
+  stroke-width: 1;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
 .bar {
-	fill: orange;
+  fill: orange;
 }
 
 .bar:hover {
-	fill: orangered ;
+  fill: orangered ;
 }
 
 .d3-tip {
-	line-height: 1;
-	font-weight: bold;
-	padding: 5px;
-	background: rgba(0, 0, 0, 0.8);
-	color: #fff;
-	border-radius: 2px;
+  line-height: 1;
+  font-weight: bold;
+  padding: 5px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
 }
 
 /* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
-	box-sizing: border-box;
-	display: inline;
-	font-size: 10px;
-	width: 100%;
-	line-height: 1;
-	color: rgba(0, 0, 0, 0.8);
-	content: "\25BC";
-	position: absolute;
-	text-align: center;
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
 }
 
 /* Style northward tooltips differently */
 .d3-tip.n:after {
-	margin: -1px 0 0 0;
-	top: 100%;
-	left: 0;
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
 }
-
 
 /* this code is for time series plot */
 div.tooltip {
- 	position: absolute;	
- 	text-align: left;	
-  	width: 200px;	
-  	padding: 8px;	
-  	font: 13px sans-serif;	
-  	background: lightsteelblue;	
-  	border: 0px;					
-  	border-radius: 8px;
-  	}
+  position: absolute; 
+  text-align: left; 
+  width: 200px; 
+  padding: 8px; 
+  font: 13px sans-serif;  
+  background: lightsteelblue; 
+  border: 0px;          
+  border-radius: 8px;
+}
 
 div.tooltip a {
-	color: blue;
-	text-decoration: none;
+  color: blue;
+  text-decoration: none;
 }
 
 div.tooltip a:hover {
-	color: blue;
-		text-decoration: underline;
+  color: blue;
+    text-decoration: underline;
+}
+
+p {
+  color: blue;
+  margin: 0.25em 0;
 }
 </style>
 
@@ -88,11 +93,8 @@ var margin = {top: 80, right: 20, bottom: 30, left: 70},
 
 var topic = 0
 
-var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width], .1);
-
-var y = d3.scale.linear()
-    .range([height, 0]);
+var x = d3.scale.ordinal().rangeRoundBands([0, width], .1);
+var y = d3.scale.linear().range([height, 0]);
 
 var xAxis = d3.svg.axis()
     .scale(x)
@@ -103,16 +105,16 @@ var yAxis = d3.svg.axis()
     .orient("left")
 
 var tip = d3.tip()
-	.attr('class', 'd3-tip')
-	.offset([-10, 0])
+  	.attr('class', 'd3-tip')
+	  .offset([-10, 0])
   	.html(function(d) {
-    return "<img src='static/topic_" + d.ntopic + ".png' style='width:120px'>"
-  	})
+      return "<img src='static/topic_" + d.ntopic + ".png' style='width:120px'>"
+    })
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-	.append("g")
+	  .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 svg.call(tip);
@@ -134,14 +136,14 @@ var	yAxis2 = d3.svg.axis().scale(y2).orient("left").ticks(5);
 // Define the line 
 var lineFunction = d3.svg.line()
     .x(function(d) { return x2(d.date); })
-    .y(function(d) { return y2(d.articles); })
+    .y(function(d) { return y2(d.fraction); })
     .interpolate("linear");
 
 
 // // Define 'div' for tooltips
 var div = d3.select("body")
-	.append("div")  // declare the tooltip div 
-	.attr("class", "tooltip")  // apply the 'tooltip' class
+    .append("div")  // declare the tooltip div 
+    .attr("class", "tooltip")  // apply the 'tooltip' class
     .style("opacity", 0);      // set the opacity to nil
 
 
@@ -155,159 +157,179 @@ var	svg2 = d3.select("body")
     "translate(" + margin.left + "," + 60 + ")");
 
 
-d3.csv("static/articles_per_topic.csv", type, function(error, data) {
+d3.csv("static/articles_per_topic.csv", type_data1, function(error, data) {
   // In the data file, ntopic starts from 0, x axis values here start from 1
-	x.domain(data.map(function(d) { return d.ntopic + 1; }));
-	y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+	x.domain(data.map(function(d) {return d.ntopic + 1;}));
+	y.domain([0, d3.max(data, function(d) {return d.frequency;})]);
 
 	svg.append("image")
 		.attr("class", "wordCloud")
 		.attr("x", 460)
-      	.attr("y", -50)
-      	.attr("width", 250)
-      	.attr("height", 125)
-      	.attr("xlink:href", "static/topic_" + topic + ".png");
+    .attr("y", -50)
+    .attr("width", 250)
+    .attr("height", 125)
+    //.attr("xlink:href", "static/topic_" + topic + ".png");
 
 	svg.append("g")
-      	.attr("class", "x axis")
-      	.attr("transform", "translate(0," + height + ")")
-      	.call(xAxis);
+   	.attr("class", "x axis")
+   	.attr("transform", "translate(0," + height + ")")
+   	.call(xAxis);
 
-  	svg.append("g")
-      	.attr("class", "y axis")
-      	.call(yAxis)
-    	.append("text")
-      	.attr("transform", "rotate(-90)")
-      	.attr("y", -40)
-      	.attr("dy", ".71em")
-      	.style("text-anchor", "end")
-      	.text("Number of Ariticles");
+ 	svg.append("g")
+   	.attr("class", "y axis")
+   	.call(yAxis)
+  	.append("text")
+   	.attr("transform", "rotate(-90)")
+   	.attr("y", -40)
+   	.attr("dy", ".71em")
+   	.style("text-anchor", "end")
+   	.text("Number of Ariticles");
 
-  	svg_bars = svg.selectAll(".bar")
-      	.data(data)
-      	.enter().append("rect")
-      	.attr("class", "bar")
-        // In the data file, ntopic starts from 0, x axis values here start from 1
-      	.attr("x", function(d) { return x(d.ntopic + 1); })
-      	.attr("width", x.rangeBand())
-      	.attr("y", function(d) { return y(d.frequency); })
-      	.attr("height", function(d) { return height - y(d.frequency); })
-      	.on('mouseover', tip.show)
-      	.on('mouseout', tip.hide);
-    // Get the data for second plot
+  svg_bars = svg.selectAll(".bar")
+   	.data(data)
+   	.enter().append("rect")
+   	.attr("class", "bar")
+   	.attr("x", function(d) { return x(d.ntopic + 1); })
+   	.attr("width", x.rangeBand())
+   	.attr("y", function(d) { return y(d.frequency); })
+   	.attr("height", function(d) { return height - y(d.frequency); })
+   	.on('mouseover', tip.show)
+   	.on('mouseout', tip.hide);
 
-    var drawLines = function(data2) {
-    	// Scale the range of the data
-    	x2.domain(d3.extent(data2, function(d) { return d.date; }));
-    	y2.domain([0, d3.max(data2, function(d) { return d.articles; })]);
 
-    	svg2.html('');
-    	// Add the X Axis
-    	svg2.append("g")
-    	.attr("class", "x axis")
-    	.attr("transform", "translate(0," + height + ")")
-    	.call(xAxis2);
+  // d3.csv("static/articles_per_week.csv", type_data3, function(error, dataW)){
     
-    	// Add the Y Axis
-    	svg2.append("g")
-    	.attr("class", "y axis")
-    	.call(yAxis2);
+  // }
 
-	    // Add the valueline path. -->
-	    svg2.append("path")
-	    	.attr('class', 'timeSeries')
-        .attr("stroke", "blue")
-        .attr("stroke-width", 2)
-        .attr("fill", "none")
-        .attr("d", lineFunction(data2));
 
-    	svg2.selectAll("dot").data(data2)
-    		.enter().append("circle")
-        .attr("class","time_plot")
-    		.attr("r", 5)
-    		.attr("cx", function(d) { return x2(d.date); })		 
-    		.attr("cy", function(d) { return y2(d.articles); })
-    		.attr("fill", "orange")
-			.on("mouseout", function(d) {
-				//d3.select(this).style("fill", "orange");
-			})
-    	// Tooltip stuff after this
-    		.on("mouseover", function(d) {
-    			resetPlot(d)
+  d3.csv("static/data.csv", type_data2, function(error, dataT) {
+	  var drawTopic = function(topic) {
+	   	var newData = dataT.filter(function(d) {
+	     		return d.topic == topic;
+	     	});
 
-    		  d3.select(this).style("fill", "red");
+	    drawTimeSeries(newData);
+	  };
 
-				  var	urls = []
-	    		var nLines = d.N_articles > 5 ? 5 : d.N_articles
-    			for(var i = 0; i < nLines; i++) {
-    				urls.push({
-    					href : d['url' + i], txt : d['headline' + i]
-    				});
-    			}
-    		
-	    		var div_tip = div.style("left", (d3.event.pageX)+ 10 + "px")
-	    				.style("top", (d3.event.pageY) + "px");
+	  var reDraw = function(d) {
+      svg2.html(''); // clear everything if any
 
-	    		div_tip.selectAll("a").data(urls).enter().append("a")
-	    		.attr("href", function(d) {return d.href;})
-	    		.html(function(d) {return d.txt + '<br/><br.>' ;})
-	    	});
-    }
+      var topic = +d.ntopic;
+      d3.select("rect.selected_bar").remove()
+      svg.append('rect')
+         .attr("class","selected_bar")
+         .attr("x", function(d) { return x(topic + 1); })    
+         .attr("y", 291)
+         .attr("width", x.rangeBand())
+         .attr("height", 18)
+         .attr("fill","orange")
+         .style("opacity", 0.5);
 
-    var resetPlot = function(d) {
     	d3.selectAll("a").remove()
-    	d3.selectAll("circle.time_plot").style("fill", "orange")
-	    div.transition().duration(500).style("opacity", 0);
-    	div.transition().duration(200).style("opacity", .9);
-    }
+    	div.style("opacity", 0)
 
-    d3.csv("static/data.csv", function(d) {
-    		d.date = parseDate(d.pub_week_date);
-    		d.articles = +d.N_articles;
-    		d.topic = +d.topic;
-    		return d;
-    	}, function(error, dataT) {
-		    var drawTopic = function(topic) {
-		    	var newData = dataT.filter(function(d) { 
-		      		return d.topic == topic;
-		      	});
+      svg.select("image.wordCloud")
+        .attr("xlink:href", "static/topic_" + d.ntopic + ".png");
 
-		      	drawLines(newData);
-		    };
+        drawTopic(topic);
+		};
 
-		    var reDraw = function(d) {
-          var topic = +d.ntopic;
-          d3.select("rect.selected_bar").remove()
-          svg.append('rect')
-             .attr("class","selected_bar")
-             .attr("x", function(d) { return x(topic + 1); })    
-             .attr("y", 291)
-             .attr("width", x.rangeBand())
-             .attr("height", 18)
-             .attr("fill","orange")
-             .style("opacity", 0.5);
+  	// draw the scatterplot
+		svg_bars.on("click", reDraw);
+		drawTopic(topic);
 
-		    	d3.selectAll("a").remove()
-		    	div.style("opacity", 0)
-
-
-		      svg.select("image.wordCloud")
-		      	 .attr("xlink:href", "static/topic_" + d.ntopic + ".png");
-		      	 drawTopic(topic);
-			};
-
-		    // draw the scatterplot
-		    svg_bars.on("click", reDraw);
-
-		    drawTopic(topic);
 	}); // csv for 2nd plot
+}); // csv for first plot
 
-}); // tsv for first plot
 
-function type(d) {
+var drawTimeSeries = function(data) {
+  // Scale the range of the data
+  x2.domain(d3.extent(data, function(d) { return d.date; }));
+  y2.domain([0, d3.max(data, function(d) { return d.fraction; })]);
+
+  svg2.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis2);
+    
+  svg2.append("g")
+    .attr("class", "y axis")
+    .call(yAxis2);
+
+  svg2.append("path") // ad value path
+    .attr('class', 'timeSeries')
+    .attr("stroke", "blue")
+    .attr("stroke-width", 2)
+    .attr("fill", "none")
+    .attr("d", lineFunction(data));
+
+  svg2.selectAll("dot").data(data)
+    .enter().append("circle")
+    .attr("class","time_plot")
+    .attr("r", 5)
+    .attr("cx", function(d) { return x2(d.date); })    
+    .attr("cy", function(d) { return y2(d.fraction); })
+    .attr("fill", "orange")
+    // Tooltip stuff after this
+    .on("mouseover", drawToolTip)
+    //.on("mouseover", function(d) {
+
+    //});
+}
+
+// draw toop tip for time series plot on mouseover
+var drawToolTip = function(d) {
+  resetToolTip(d)
+
+  d3.select(this).style("fill", "red");
+
+  var urls = []
+  var nLines = d.n_articles > 5 ? 5 : d.n_articles
+  for(var i = 0; i < nLines; i++) {
+    urls.push({href : d['url' + i], txt : d['headline' + i]});
+  }
+
+  var div_tip = div.style("left", (d3.event.pageX)+ 10 + "px")
+                   .style("top", (d3.event.pageY) + "px");
+
+  
+  div_tip.selectAll("a").data(urls).enter().append("a")
+    .attr("href", function(d) {return d.href;})
+    .html(function(d) {return d.txt + '<br/>' ;})
+
+  div_tip.append("p").attr("class","number").text('Articles: '+d.n_articles)
+}
+
+// reset time series plot tooltip
+var resetToolTip = function(d) {
+  d3.selectAll("a").remove()
+  d3.selectAll("circle.time_plot").style("fill", "orange")
+  d3.selectAll("p.number").remove()
+  div.transition().duration(500).style("opacity", 0);
+  div.transition().duration(200).style("opacity", .9);
+}
+
+// change type of data for first file
+function type_data1(d) {
   d.ntopic = +d.ntopic
   d.frequency = +d.frequency;
   return d;
 }
+
+// change type of data for the 2nd file
+function type_data2(d) {
+  d.date = parseDate(d.pub_week_date);
+  d.n_articles = +d.n_articles;
+  d.fraction =  +d.n_articles  //+d.fraction
+  d.topic = +d.topic;
+  return d;
+}
+
+
+function type_data3(d) {
+  d.date = parseDate(d.date);
+  d.articles_week = +d.articles_week
+}
+
 
 </script>
