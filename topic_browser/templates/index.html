@@ -92,6 +92,7 @@ var margin = {top: 80, right: 20, bottom: 30, left: 70},
     height = 400 - margin.top - margin.bottom;
 
 var topic = 0
+var max_topics = 0
 
 var x = d3.scale.ordinal().rangeRoundBands([0, width], .1);
 var y = d3.scale.linear().range([height, 0]);
@@ -108,7 +109,8 @@ var tip = d3.tip()
   	.attr('class', 'd3-tip')
 	.offset([-10, 0])
   	.html(function(d) {
-		return "<img src='static/topic_" + d.ntopic + ".png' style='width:120px'>"
+		return "<img src='static/topic_" + max_topics + "_" + d.ntopic +
+				".png' style='width:120px'>"
     })
 
 var svg = d3.select("body").append("svg")
@@ -173,6 +175,9 @@ d3.csv("static/articles_per_topic.csv", type_data1, function(error, data) {
 	// In the data file, ntopic starts from 0, x axis values here start from 1
 	x.domain(data.map(function(d) {return d.ntopic + 1;}));
 	y.domain([0, d3.max(data, function(d) {return d.frequency;})]);
+
+	max_topics = d3.max(data, function(d) {return d.ntopic + 1;})
+	console.log(max_topics)
 
 	svg.append("image")
 		.attr("class", "wordCloud")
@@ -282,7 +287,8 @@ d3.csv("static/articles_per_topic.csv", type_data1, function(error, data) {
 	    	div.style("opacity", 0)
 
 	      	svg.select("image.wordCloud")
-	        	.attr("xlink:href", "static/topic_" + d.ntopic + ".png");
+	        	.attr("xlink:href", "static/topic_" + max_topics + "_" +
+	        						d.ntopic + ".png");
 
 	        svg2.append("text")
 				.attr("class","title")
