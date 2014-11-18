@@ -1,5 +1,2 @@
-### Trends in Tech News
-The purpose of this project is to look at trends in tech news over the past few 
-years. This would require identifying topics in the tech news (topic modeling), 
-and then observe topic frequency in the news (maybe per month) over time for las
-t few years. 
+### Tech Chatter in the News
+This projec is focused on discovering abstract topics in technology news using topic modeling algorithms, and observing the evolution of these topics over time. Project demo at iyounus.github.io.  
