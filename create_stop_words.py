@@ -1,6 +1,6 @@
 from nltk.corpus import stopwords
 
-def stop_words()
+def stop_words():
     '''
     INPUT None
     OUTPUT None
@@ -12,7 +12,7 @@ def stop_words()
     # some extra stop words not present in stopwords
     stop += ['said', 'would', 's', 'also', 'u', 'mr', 're', 'may', 'one',\
              'two', 'buy', 'much', 'take', 'might', 'say', 'new', 'year',
-             'many', 'reporting', 'editing']
+             'many', 'reporting', 'editing', 'get']
 
     return sorted(set(stop))
 

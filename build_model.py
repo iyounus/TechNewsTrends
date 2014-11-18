@@ -9,7 +9,7 @@ from utils import stop_words, tokenize
 
 class Model(object):
 
-    def __init__(self, n_topics, n_features=5000, df=None,
+    def __init__(self, n_topics, n_features=6000, df=None,
                  vectorizer=None, vector=None, outdir='data/'):
         self.n_topics = n_topics
         self.n_features = n_features
@@ -32,7 +32,8 @@ class Model(object):
         TfidfVectorizer.
         '''
         if self.vectorizer is None:
-            self.vectorizer = TfidfVectorizer(tokenizer=tokenize,
+            stop = stop_words()
+            self.vectorizer = TfidfVectorizer(tokenizer=tokenize, ngram_range=(1,2),
                                               max_features=self.n_features)
             self.vector = self.vectorizer.fit_transform(self.df.content).toarray()
 
@@ -59,10 +60,11 @@ if __name__ == '__main__':
     df = None
 
     try:
-        #If the pickle file already exists, then load the vectorizer from pickle
+        # If the pickle file already exists, then load the vectorizer from pickle
         f = open("data/vectorizer.pkl")
         vectorizer, vector = pkl.load(f)
     except:
+        # If the vectorizer doesn't exist, I need the data to create one
         df = pkl.load(open('data/data_all.pkl'))
 
     for n in n_topics:

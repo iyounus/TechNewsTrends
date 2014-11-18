@@ -25,6 +25,7 @@ but
 buy
 by
 can
+day
 did
 do
 does
@@ -33,10 +34,13 @@ don
 down
 during
 each
+editing
 few
 for
 from
 further
+get
+ha
 had
 has
 have
@@ -89,6 +93,7 @@ out
 over
 own
 re
+reporting
 s
 said
 same
@@ -122,6 +127,7 @@ under
 until
 up
 very
+wa
 was
 we
 were

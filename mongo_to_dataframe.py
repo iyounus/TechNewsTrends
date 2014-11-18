@@ -40,6 +40,10 @@ class MongoToDataFrame(object):
         # there are some duplicates in the db, so drop these here before further analysis
         self.df.drop_duplicates('web_url', inplace=True)
 
+        self.df['headline_lower'] = self.df['headline'].map(lambda x : x.lower())
+        self.df.drop_duplicates('headline_lower', inplace=True)
+        del self.df['headline_lower']
+
         #temporarily store only data for last three years
         self.df['pub_date'] = pd.to_datetime(self.df['pub_date'])
         self.df = self.df[self.df['pub_date'] > "2011-12-31"]

@@ -7,7 +7,6 @@ import sys
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
-#from write_web_app_csv import assign_topics
 from utils import stop_words, tokenize
 
 
@@ -37,7 +36,8 @@ def assign_topics(df, modle, vectors):
 
     df['topic'] = list(np.argmax(A, axis=1))
     df['weight'] = list(np.max(A, axis=1))
-
+    df = df[df['weight']>0.5]
+    
     # now sort topics w.r.t number of articles per topic
     # this is just renaming the topic
     dg = df[['topic','headline']].groupby('topic')

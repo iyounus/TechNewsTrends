@@ -20,14 +20,15 @@ def tokenize(article):
     stop = stop_words()
     tokens = [word.lower() for word in word_tokenize(article)]
 
+    # lemmatize
+    lmtzr = WordNetLemmatizer()
+    tokens = [lmtzr.lemmatize(word) for word in tokens]
+
+    # now remove stop words
     tokens = [word for word in tokens if word not in stop]
 
     # remove words less than three letters
     tokens = [word for word in tokens if len(word) >= 3]
-
-    # lemmatize
-    lmtzr = WordNetLemmatizer()
-    tokens = [lmtzr.lemmatize(word) for word in tokens]
 
     return tokens
 

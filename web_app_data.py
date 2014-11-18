@@ -8,7 +8,6 @@ import sys
 
 from datetime import date, timedelta as tdel
 
-
 class WebAppData(object):
 
     def __init__(self, df, model, vectors):
@@ -45,6 +44,7 @@ class WebAppData(object):
 
         self.df['topic'] = list(np.argmax(A, axis=1))
         self.df['weight'] = list(np.max(A, axis=1))
+        self.df = self.df[self.df['weight']>0.5]
 
         # now sort topics w.r.t number of articles per topic
         # this is just renaming the topic
